@@ -18,7 +18,7 @@ const tasks = [
   },
 ];
 
-(function(arrOfTasks) {
+(function (arrOfTasks) {
   const objOfTasks = arrOfTasks.reduce((acc, task) => {
     acc[task._id] = task;
     return acc;
@@ -26,18 +26,34 @@ const tasks = [
 
   // UI Elements
   const tasksList = document.querySelector('.tasks-list-section .list-group');
+  const allTaskBtn = document.querySelector('.all-tak');
+  const notCompTaskBtn = document.querySelector('.not-compl-task');
   const form = document.forms['addTask'];
   const inputTitle = form.elements['title'];
   const inputBody = form.elements['body'];
+  let message;
+  console.log(notCompTaskBtn);
 
-  renderTasks();
+  if (tasks.length === 0) {
+    message = document.createElement('li');
+    message.textContent = "No tasks";
+    message.classList.add(
+      'list-group-item',
+      'text-center',
+    );
+    tasksList.appendChild(message);
+  }
+
+  renderTasks(objOfTasks);
   form.addEventListener('submit', onFormSubmitHandler);
   tasksList.addEventListener('click', onDeleteHandler);
+  //allTaskBtn.addEventListener('click', onShowAllTasks);
+  notCompTaskBtn.addEventListener('click', onShowNotCompTasks);
 
   // Functions
-  function renderTasks() {
+  function renderTasks(taskArray) {debugger;
     const fragment = document.createDocumentFragment();
-    Object.values(objOfTasks).forEach(task => {
+    Object.values(taskArray).forEach(task => {
       const li = listItemTemplate(task);
       fragment.appendChild(li);
     });
@@ -51,16 +67,21 @@ const tasks = [
       'd-flex',
       'align-items-center',
       'flex-wrap',
+      'bgd-none'
     );
     li.setAttribute('data-task-id', task._id);
 
     const span = document.createElement('span');
     span.textContent = task.title;
     span.style.fontWeight = 'bold';
-    
+
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.classList.add('btn', 'btn-danger', 'ml-auto', 'delete-btn');
+
+    const doneBtn = document.createElement('button');
+    doneBtn.textContent = 'Done';
+    doneBtn.classList.add('btn', 'btn-success', 'ml-2', 'done-btn');
 
     const article = document.createElement('p');
     article.textContent = task.body;
@@ -68,6 +89,7 @@ const tasks = [
 
     li.appendChild(span);
     li.appendChild(deleteBtn);
+    li.appendChild(doneBtn);
     li.appendChild(article);
 
     return li;
@@ -82,10 +104,10 @@ const tasks = [
       alert('Пожалуйста введите title и body');
       return;
     }
-
     const task = createNewTask(titleValue, bodyValue);
     const listItem = listItemTemplate(task);
     tasksList.insertAdjacentElement('afterbegin', listItem);
+
     form.reset();
   }
 
@@ -98,6 +120,7 @@ const tasks = [
     };
 
     objOfTasks[newTask._id] = newTask;
+    message.style.display = 'none';
 
     return { ...newTask };
   }
@@ -109,6 +132,26 @@ const tasks = [
       const id = parent.dataset.taskId;
       parent.remove();
       delete objOfTasks[id];
+      if (Object.keys(objOfTasks).length == 0) {
+        message.style.display = 'block';
+      }
     }
+    if (target.classList.contains('done-btn')) {
+      const parent = target.closest('[data-task-id]');
+      const id = parent.dataset.taskId;
+      if (parent.classList.toggle('bgd-green')) {
+        objOfTasks[id].completed = true;
+      }
+      if (parent.classList.toggle('bgd-none')) {
+        objOfTasks[id].completed = false;
+      }
+
+    }
+  }
+
+  function onShowNotCompTasks() {debugger;
+    console.log(arrOfTasks);
+    let remainingTasks = arrOfTasks.filter(item => item.completed === false);
+    renderTasks(remainingTasks);
   }
 })(tasks);
