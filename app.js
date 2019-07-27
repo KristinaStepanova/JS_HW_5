@@ -6,11 +6,11 @@ const tasks = [
     completed: true,
     body:
       'Occaecat non ea quis occaecat ad culpa amet deserunt incididunt elit fugiat pariatur. Exercitation commodo culpa in veniam proident laboris in. Excepteur cupidatat eiusmod dolor consectetur exercitation nulla aliqua veniam fugiat irure mollit. Eu dolor dolor excepteur pariatur aute do do ut pariatur consequat reprehenderit deserunt.\r\n',
-    title: 'Eu ea incididunt sunt consectetur fugiat non.',
+    title: 'Eu ea incididunt sunt consectetur fugiat nonOccaecat non ea quis occaecat ad culpa.',
   },
   {
     _id: '5d2ca9e29c8a94095c4e88e0',
-    completed: true,
+    completed: false,
     body:
       'Aliquip cupidatat ex adipisicing veniam do tempor. Lorem nulla adipisicing et esse cupidatat qui deserunt in fugiat duis est qui. Est adipisicing ipsum qui cupidatat exercitation. Cupidatat aliqua deserunt id deserunt excepteur nostrud culpa eu voluptate excepteur. Cillum officia proident anim aliquip. Dolore veniam qui reprehenderit voluptate non id anim.\r\n',
     title:
@@ -27,12 +27,11 @@ const tasks = [
   // UI Elements
   const tasksList = document.querySelector('.tasks-list-section .list-group');
   const allTaskBtn = document.querySelector('.all-tak');
-  const notCompTaskBtn = document.querySelector('.not-compl-task');
+  const unCompTaskBtn = document.querySelector('.uncompl-task');
   const form = document.forms['addTask'];
   const inputTitle = form.elements['title'];
   const inputBody = form.elements['body'];
   let message;
-  console.log(notCompTaskBtn);
 
   if (tasks.length === 0) {
     message = document.createElement('li');
@@ -44,16 +43,16 @@ const tasks = [
     tasksList.appendChild(message);
   }
 
-  renderTasks(objOfTasks);
+  renderTasks();
   form.addEventListener('submit', onFormSubmitHandler);
   tasksList.addEventListener('click', onDeleteHandler);
-  //allTaskBtn.addEventListener('click', onShowAllTasks);
-  notCompTaskBtn.addEventListener('click', onShowNotCompTasks);
+  allTaskBtn.addEventListener('click', onFilteredTasks);
+  unCompTaskBtn.addEventListener('click', onFilteredTasks);
 
   // Functions
-  function renderTasks(taskArray) {debugger;
+  function renderTasks() {
     const fragment = document.createDocumentFragment();
-    Object.values(taskArray).forEach(task => {
+    Object.values(objOfTasks).forEach(task => {
       const li = listItemTemplate(task);
       fragment.appendChild(li);
     });
@@ -149,9 +148,24 @@ const tasks = [
     }
   }
 
-  function onShowNotCompTasks() {debugger;
-    console.log(arrOfTasks);
-    let remainingTasks = arrOfTasks.filter(item => item.completed === false);
-    renderTasks(remainingTasks);
+  function toggleTasks(sortType) {
+    Object.values(objOfTasks).forEach(task => {
+      switch (sortType) {
+        case 'all':
+          document.querySelector(`[data-task-id='${task._id}']`).classList.remove('completed');
+          break;
+        case 'uncompleted':
+          if (task.completed){
+            document.querySelector(`[data-task-id='${task._id}']`).classList.add('completed');
+          }
+          break;
+      }
+    })
+  }
+
+  function onFilteredTasks(e) {
+    const { target } = e;
+    const sortType = target.dataset.taskSort;
+    toggleTasks(sortType);
   }
 })(tasks);

@@ -4,3 +4,6 @@
 .bgd-none{
     background: none;
 }
+.completed{
+    display: none !important;
+}
