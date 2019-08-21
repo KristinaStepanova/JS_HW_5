@@ -1,0 +1,9 @@
+.bgd-green{
+    background: #deffe7;
+}
+.bgd-none{
+    background: none;
+}
+.completed{
+    display: none !important;
+}
